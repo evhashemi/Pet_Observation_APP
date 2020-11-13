@@ -107,7 +107,7 @@ if __name__ == '__main__':
     while True:
         #check a weather API either for thunderstorms or barometric pressure
         #publish weather update
-        if count == 20:
+        if count == 600000:
             count = 0
             val = [weather_api.API]
             cache = val[0]['pressure']()
