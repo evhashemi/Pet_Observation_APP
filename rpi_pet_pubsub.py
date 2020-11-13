@@ -12,7 +12,8 @@ import sys
 import weather_api
 
 sys.path.append('/home/pi/Dexter/GrovePi/Software/Python')
-setText_norefresh(" ")
+with lock:
+    setText_norefresh(" ")
 LCD_LINE_LEN = 16
 lcd_input = ""
 global lcd_flag
