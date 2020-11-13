@@ -1,39 +1,52 @@
 import paho.mqtt.client as mqtt
+import PySimpleGUI as gui
 import time
+flag = 0
+
+def getLayout1():
+    return [[gui.Text("Welcome to Pet Observation APP! \nplease choose a following action:\n1. 'get status': to see if your pet is in the cage\n2. 'play music': to play a song to relax your pet\n3. 'visualize data': TBD\n4. 'send message': send a 32 character max message\n5. 'change zipcode': change zipcode to location of pet")],
+            [gui.Text("Notifications: "), gui.Text(size=(75,1), key='-OUTPUT-')],
+            [gui.Input(key='-IN-')],
+            [gui.Button('Enter')]]
+
+def getLayout2():
+    return [[gui.Text("Enter message to send:")],
+            [gui.Text("Notifications:"), gui.Text(size=(75,1), key='-OUTPUT-')],
+            [gui.Input(key='-IN-')],
+            [gui.Button('Enter')]]
+
+def getLayout3():
+    return [[gui.Text("Enter new zip code:")],
+            [gui.Text("Notifications:"), gui.Text(size=(75,1), key='-OUTPUT-')],
+            [gui.Input(key='-IN-')],
+            [gui.Button('Enter')]]
+
+
+window = gui.Window('Pet Observation App', getLayout1())
 
 import threading
 lock = threading.Lock()
-
-valid_commands = ['get_status', 'play_music', 'visualize_data', 'send_message', 'change_zipcode']
-print("Choose from following commands and hit enter: {}".format(valid_commands))
-command = ''
-
-def command_is_valid(inp):
-    if inp in valid_commands:
-        return True
-    elif inp == "":
-       x = 1    
-    else:
-        print('Valid commands are {}'.format(valid_commands))
-        return False
 
 # ALL subscribe callbacks here
 
 ## noise alert
 def noise_alert(client, userdata, msg):
-    noise = str(msg.payload, "utf-8")
-
-    print("A noise of " + noise + " dB was detected, would you like to play calming music?  play_music ")
+    noise = "A loud noise was detected, would you like to play music to calm the pet? Type play music"
+    window['-OUTPUT-'].update(noise)
+    
 
 ## location request
 def print_location(client, userdata, msg):
     location = str(msg.payload, "utf-8")
+    location1 = "Pet is " + location
+    window['-OUTPUT-'].update(location1)
     print("Response: Pet is " + location)
 
 
 ## weather alert
 def weather_alert(client, userdata, msg):
-    print("A storm may be coming in your area, would you like to play calming music?  Type play_music ")
+    notif = "A storm may be coming in your area, would you like to play calming music? Type play music"
+    window['-OUTPUT-'].update(notif)
 
 
 #general MQTT setup
@@ -63,67 +76,54 @@ def publish_bank(key):
         client.publish("petStat/request")
     elif key == 'music':
         client.publish("petStat/play_music")
-    elif key == 'message':
-        inp = input("Enter your message here: ")
-        client.publish("petStat/message", inp)
-    elif key == 'zip':
-        inp = input("Enter your zipcode: ")
-        client.publish("petStat/zipcode", inp)
-    command = ''
 
+def sendMess(message):
+    client.publish("petStat/message", message)
+    flag = 0
+
+def sendZip(zip):
+    client.publish("petStat/zipcode",zip)
+    flag = 0
 
 if __name__ == '__main__':
-    with lock:
     #create MQTT connection
-        client = mqtt.Client()
-        client.on_message = on_message
-        client.on_connect = on_connect
-        client.connect(host="eclipse.usc.edu", port=11000, keepalive=60)
-        client.loop_start()
+    client = mqtt.Client()
+    client.on_message = on_message
+    client.on_connect = on_connect
+    client.connect(host="eclipse.usc.edu", port=11000, keepalive=60)
+    client.loop_start()
 
-    #keyboard listener
-    
-    command = ""
-    user_input = ""
+    while True: 
+        event, values = window.read()
+        print(values)
+        if event == gui.WIN_CLOSED:
+            break
+        if flag == 0:
+            if event == 'Enter':
+                if values['-IN-'] == 'send message':
+                    print("hello")
+                    flag = 1
+                    window.close()
+                    window = gui.Window('Pet Observation App Message Screen', getLayout2())
+                elif values['-IN-'] == 'get status':
+                    publish_bank('status')
+                elif values['-IN-'] == 'play music':
+                    publish_bank('music')
+                elif values['-IN-'] == 'change zipcode':
+                    flag = 2
+                    window.close()
+                    window = gui.Window('Pet Observation App Zipcode Change', getLayout3())
+        elif flag == 1:
+            if event == 'Enter':
+                sendMess(values['-IN-'])
+                flag = 0
+                window.close()
+                window = gui.Window('Pet Observation App', getLayout1())
+        else:
+            if event == 'Enter':
+                sendZip(values['-IN-'])
+                flag = 0
+                window.close()
+                window = gui.Window('Pet Observation App', getLayout1())
 
-    #print('Command: ')
-    while command != 'quit' and command != 'q':
-        while not command_is_valid(user_input):
-
-            user_input = input()
-            command = user_input
-        if command == 'get_status':
-            try:
-                publish_bank("status")
-                user_input = ""
-            except Exception as e:
-                print(e)
-        elif command == "play_music":
-            try:
-                publish_bank("music")
-                user_input = ""
-            except Exception as e:
-                print(e)
-        elif command == "visualize_data":
-            try:
-                publish_bank("visualize")
-                user_input = ""
-            except Exception as e:
-                print(e)
-        elif command == "send_message":
-            try:
-                publish_bank("message")
-                user_input = ""
-            except Exception as e:
-                print(e)
-        elif command == "change_zipcode":
-            try:
-                publish_bank("zip")
-                user_input = ""
-            except Exception as e:
-                print(e)
-    #intro message
-    #print statement with intro to the program and list of possible commands
-    
-    while True:
-        time.sleep(1)
+    while True: time.sleep(1)
