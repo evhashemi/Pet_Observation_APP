@@ -114,20 +114,7 @@ if __name__ == '__main__':
             if cache < 1000:
                 client.publish('petStat/weather')
         
-        #print(lcd_flag)
-        if lcd_flag == 1:
-            print("dick")
-            lcd_flag = 0
-            setRGB(200,0,255)
-            #setText_norefresh("dickkkkkkkkkkkkk")
-            with lock:
-                setText_norefresh("NEW MESSAGE")
-                for i in range (length):
-                    setText_norefresh("\n" + lcd_input[i:i+LCD_LINE_LEN])
-                    time.sleep(0.1)
-                #setText_norefresh("pipi")
-                #print(lcd_input)
-                setRGB(0,0,0)
+       
 
 
 
@@ -136,10 +123,14 @@ if __name__ == '__main__':
         #publish notification
         #distance = gp.ultrasonicRead(ranger)
         #print(distance)
-        #if distance < 25:
-            #active = 0
-        #else:
-            #active = 1
+        if( count % 300) == 0:
+            with lock:
+                distance = gp.ultrasonicRead(ranger)
+            if distance < 25:
+                active = 0
+            else:
+                active = 1
+            client.publish("petStat/real_time", active)
         
         #check sound levels
         with lock:

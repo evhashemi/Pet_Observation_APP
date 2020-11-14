@@ -1,7 +1,12 @@
 import paho.mqtt.client as mqtt
 import PySimpleGUI as gui
+import matplotlib.pyplot as plt
 import time
 flag = 0
+
+index = 0
+activity = []
+activity_times = []
 
 def getLayout1():
     return [[gui.Text("Welcome to Pet Observation APP! \nplease choose a following action:\n1. 'get status': to see if your pet is in the cage\n2. 'play music': to play a song to relax your pet\n3. 'visualize data': TBD\n4. 'send message': send a 32 character max message\n5. 'change zipcode': change zipcode to location of pet")],
@@ -48,6 +53,20 @@ def weather_alert(client, userdata, msg):
     notif = "A storm may be coming in your area, would you like to play calming music? Type play music"
     window['-OUTPUT-'].update(notif)
 
+def real_time_data(client, userdata, msg):
+    active = str(msg.payload, "utf-8")
+    activity[index] = int(active)
+    t = time.localtime()
+    current_t = time.strftime("%H:%M:%S", t)
+    # current_t would be something like 08:45:23
+    activity_times[index] = current_t
+    index = index + 1
+    if index == 5:
+        del activity[0]
+        del activity_times[0]
+    print(activity)
+    print(activity_times)
+
 
 #general MQTT setup
 def on_connect(client, userdata, flags, rc):
@@ -62,6 +81,9 @@ def on_connect(client, userdata, flags, rc):
 
     client.subscribe("petStat/weather")
     client.message_callback_add("petStat/weather", weather_alert)
+
+    client.subscribe("petStat/real_time")
+    client.message_callback_add("petStat/real_time", real_time_data)
     
 
 def on_message(client, userdata, msg):
