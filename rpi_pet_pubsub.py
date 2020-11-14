@@ -74,6 +74,7 @@ def print_message(client, userdata, msg):
             dist = gp.ultrasonicRead(ranger)
         setRGB(0,255,0)
         setText_norefresh(string)
+
 #general MQTT setup
 def on_connect(client, userdata, flags, rc):
     print("Connected to broker with the following result "+str(rc))
@@ -123,7 +124,7 @@ if __name__ == '__main__':
         #publish notification
         #distance = gp.ultrasonicRead(ranger)
         #print(distance)
-        if( count % 300) == 0:
+        if( count % 30) == 0:
             with lock:
                 distance = gp.ultrasonicRead(ranger)
             if distance < 25:
