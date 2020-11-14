@@ -2,10 +2,14 @@ import paho.mqtt.client as mqtt
 import PySimpleGUI as gui
 import matplotlib.pyplot as plt
 import time
+import sys
 flag = 0
 
+global index
 index = 0
+#global activity
 activity = []
+
 activity_times = []
 
 def getLayout1():
@@ -53,19 +57,27 @@ def weather_alert(client, userdata, msg):
     notif = "A storm may be coming in your area, would you like to play calming music? Type play music"
     window['-OUTPUT-'].update(notif)
 
-def real_time_data(client, userdata, msg):
-    active = str(msg.payload, "utf-8")
-    activity[index] = int(active)
+def store_data(inp):
+    global index
+    activity.append(int(inp))
     t = time.localtime()
     current_t = time.strftime("%H:%M:%S", t)
-    # current_t would be something like 08:45:23
-    activity_times[index] = current_t
-    index = index + 1
-    if index == 5:
+    activity_times.append(current_t)
+    index += 1
+    print(index)
+    if index == 4:
+        index -= 1
         del activity[0]
         del activity_times[0]
     print(activity)
     print(activity_times)
+    
+
+def real_time_data(client, userdata, msg):
+    active = str(msg.payload, "utf-8")
+    #print(active)
+    store_data(active)
+    
 
 
 #general MQTT setup
@@ -148,4 +160,4 @@ if __name__ == '__main__':
                 window.close()
                 window = gui.Window('Pet Observation App', getLayout1())
 
-    while True: time.sleep(1)
+    sys.exit(0)
