@@ -1,19 +1,29 @@
-
+## MQTT Import
 import paho.mqtt.client as mqtt
+
+## Grovepi Imports
 
 import grovepi as gp
 from grove_rgb_lcd import *
-import threading #we might use this, might not
+import threading
 lock = threading.Lock()
-import pickle
 import pygame
 import time
 import sys
+
+## Our Weather App, using data from WeatheStack
+
 import weather_api
 
 sys.path.append('/home/pi/Dexter/GrovePi/Software/Python')
+
+## Initialize variables/sensors
+
 setText_norefresh(" ")
+
+## If you have a half working LCD like me you can set this to 8
 LCD_LINE_LEN = 16
+
 lcd_input = ""
 global lcd_flag
 lcd_flag = 0
