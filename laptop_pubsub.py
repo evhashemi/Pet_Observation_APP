@@ -110,7 +110,7 @@ def publish_bank(key):
         client.publish("petStat/play_music")
 
 # Publish method to send instructions or a not to the lcd of the RPI
-def sendMess(message):
+def send_mess(message):
     client.publish("petStat/message", message)
     flag = 0
 
@@ -155,7 +155,7 @@ if __name__ == '__main__':
                     
         elif flag == 1: # We are in second window to send message 
             if event == 'Enter':
-                sendMess(values['-IN-']) # send message
+                send_mess(values['-IN-']) # send message
                 flag = 0
                 window.close()
                 window = gui.Window('Pet Observation App', getLayout1()) # After message sent, return to main GUI layout
