@@ -23,7 +23,7 @@ import weather_api
 
 sys.path.append('/home/pi/Dexter/GrovePi/Software/Python')
 
-## Initialize variables/sensors
+## Clear lcd screen
 
 setText_norefresh(" ")
 
@@ -31,7 +31,7 @@ setText_norefresh(" ")
 ## If you have a half working LCD like me you can set this to 8, otherwise 16
 LCD_LINE_LEN = 16
 
-#activity_file = 'active.pickle'
+## Initialize variables/sensors
 
 sound_sensor = 0
 gp.pinMode(sound_sensor,"INPUT")
@@ -78,13 +78,13 @@ def print_message(client, userdata, msg):
     with lock:
         setRGB(200,0,0)
         setText_norefresh("NEW MESSAGE")
-        for j in range (0,1):
+        for j in range (0,1): # scrolls message
             for i in range (0, length+1):
                 setText_norefresh("\n" + lcd_input[i:i+LCD_LINE_LEN])
                 time.sleep(0.5)
             dist = gp.ultrasonicRead(ranger)
         setRGB(0,255,0)
-        setText_norefresh(string)
+        setText_norefresh(string) # display full message 
 
 ## General MQTT functions
 
@@ -132,7 +132,7 @@ if __name__ == '__main__':
             if pressure < 2000:                  # Only notify user if pressure is below a threshold that indicates a storm is coming
                 client.publish('petStat/weather')
         
-        ## Consistently publish pet's state real time. Like the previous function, this is called every 30*0.1 = 3 seconds
+        ## Consistently publish pet's state real time. unlike the previous function, this is called every 30*0.1 = 3 seconds
         if( count % 30) == 0:
             with lock:
                 distance = gp.ultrasonicRead(ranger)

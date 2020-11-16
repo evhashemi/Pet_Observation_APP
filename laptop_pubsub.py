@@ -55,25 +55,25 @@ def store_data(inp):
 # noise alert: Tells user that a noise (that breaks the threshold to be considered a bark) was detected
 def noise_alert(client, userdata, msg):
     noise = "A loud noise was detected, would you like to play music to calm the pet? Type play music"
-    window['-OUTPUT-'].update(noise)
+    window['-OUTPUT-'].update(noise) # update GUI
     
 # location request: Tells user if pet is in bed or not in bed
 def print_location(client, userdata, msg):
     location = str(msg.payload, "utf-8")
     location1 = "Pet is " + location
     window['-OUTPUT-'].update(location1)
-    print("Response: Pet is " + location)
+    #print("Response: Pet is " + location)
 
 # weather alert: Warns user of incoming storms that may affect pet
 def weather_alert(client, userdata, msg):
     notif = "A storm may be coming, would you like to play calming music? Type play music"
-    window['-OUTPUT-'].update(notif)    
+    window['-OUTPUT-'].update(notif)  # update GUI
 
 # Activity data: Continuously recieves activity levels (active or not) of pet
 def real_time_data(client, userdata, msg):
     active = str(msg.payload, "utf-8")
     #print(active)
-    store_data(active)
+    store_data(active) # store activity levels
     
 
 
