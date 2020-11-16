@@ -66,7 +66,7 @@ def print_location(client, userdata, msg):
 
 # weather alert: Warns user of incoming storms that may affect pet
 def weather_alert(client, userdata, msg):
-    notif = "A storm may be coming in your area, would you like to play calming music? Type play music"
+    notif = "A storm may be coming, would you like to play calming music? Type play music"
     window['-OUTPUT-'].update(notif)    
 
 # Activity data: Continuously recieves activity levels (active or not) of pet
@@ -143,6 +143,7 @@ if __name__ == '__main__':
                     
                 elif values['-IN-'] == 'play music': # Play music to soothe pet
                     publish_bank('music')
+                    window['-OUTPUT-'].update("Disclaimer: Pet Observer cannot handle other requests while playing music")
                     
                 elif values['-IN-'] == 'visualize data': # See pet activity levels over time
                     plt.plot(activity_times, activity)
